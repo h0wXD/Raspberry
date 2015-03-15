@@ -1,0 +1,31 @@
+#!/bin/bash
+#/etc/init.d/quadrelay
+#TODO after:
+#sudo chmod +x /etc/init.d/quadrelay
+#sudo update-rc.d -f quadrelay start 4
+
+GPIO="/usr/local/bin/gpio"
+COUNT=3
+
+case "$1" in
+start)
+	echo "Starting relay"
+	# write to pins; which makes sure the relay is kept off
+	for i in $(seq 0 $COUNT);
+	do
+		$GPIO write $i 1
+		$GPIO mode $i out
+		echo "Disabling auto start for relay $i"
+	done
+;;
+stop)
+	echo "Stopping relay"
+;;
+*)
+	echo "Usage: $0 {start|stop}"
+	exit 1
+;;
+esac
+
+exit 0
+
