@@ -1,31 +1,27 @@
 ﻿<?php
 include('settings.php');
+include('include/gpio.inc.php');
 
-if (isset($_GET["pin"]) && isset($_GET["status"]))
+if (isset($_GET["pin"]) /*&& isset($_GET["status"])*/)
 {
 	$pin = strip_tags($_GET["pin"]);
-	$status = strip_tags($_GET["status"]);
+	//$status = strip_tags($_GET["status"]);
 	
-	$toggleValues = array('0' => '1', '1' => '0');
+	$gpio = new Gpio(RELAY_COUNT);
 
-	if (is_numeric($pin) && is_numeric($status) && 
-		$pin <= $relayCount && $pin >= 0 && 
-		$status == "0" || $status == "1")
+	try
 	{
-		$newStatus = $toggleValues[$status];
-		
-		system("gpio mode ".$pin." out");
-		system("gpio write ".$pin." ".$newStatus);
-		
-		echo($newStatus);
+		$outputStatus = null;
+		if ($gpio->toggle($pin, $outputStatus))
+		{
+			die($outputStatus);
+		}
 	}
-	else
+	catch (Exception $e)
 	{
-		echo("fail");
+		die($e->getMessage());
 	}
 }
-else
-{
-	echo ("fail");
-}
+
+die("fail");
 ?>

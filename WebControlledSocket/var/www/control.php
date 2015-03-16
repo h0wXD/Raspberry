@@ -1,4 +1,4 @@
-﻿<?php include('settings.php'); ?><!DOCTYPE html>
+﻿<?php error_reporting(E_ALL); include('settings.php'); include('include/gpio.inc.php'); ?><!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8" />
@@ -6,6 +6,8 @@
 		<script type="text/javascript">
 			function ajaxToggle(sender, pin, status)
 			{
+				sender.src = "image/gray/button" + pin + ".jpg";
+			
 				var request = new XMLHttpRequest();
 				request.open("GET", "gpio.php?pin=" + pin + "&status=" + status);
 				request.send(null);
@@ -15,8 +17,10 @@
 					if (request.readyState == 4 && request.status == 200)
 					{
 						var status = parseInt(request.responseText);
+						var color = status == <?php echo Gpio::STATUS_OFF; ?> ? "red" : "green";
+						
 						sender.alt = "" + status;
-						sender.src = ~sender.src.indexOf('green') ? "image/red/red_" + pin + ".jpg" : "image/green/green_" + pin + ".jpg";
+						sender.src = "image/" + color + "/button" + pin + ".jpg";
 					}
 					else if (request.readyState == 4 && request.status == 500)
 					{
@@ -27,31 +31,35 @@
 		
 			function onClick(sender)
 			{
+				if (~sender.src.indexOf('gray'))
+				{
+					return;
+				}
+				
 				var pin = sender.id.slice(-1);
 				var value = parseInt(sender.alt);
-
+				
 				ajaxToggle(sender, pin, value);
 			}
 		</script>
     </head>
     <body style="background-color: black;">
 	<?php
-	function renderButton($i, $outputStatus)
+	function renderButton($pin, $outputStatus)
 	{
-		$image = 'image/';
-		$image .= $outputStatus == 1 ? 'red/red_' : 'green/green_';
-		$image .= $i.'.jpg';
-		
-		echo ('<img id="button'.$i.'" src="'.$image.'" alt="'.$outputStatus.'" onClick="javascript:onClick(this);" />');
+		$color = $outputStatus == Gpio::STATUS_OFF ? 'red' : 'green';
+		$image = sprintf('image/%s/button%s.jpg', $color, $pin);
+
+		echo ('<img id="button'.$pin.'" src="'.$image.'" alt="'.$outputStatus.'" onClick="javascript:onClick(this);" />');
 	}
 	
-	for ($i = 0; $i < $relayCount; $i++)
+	$gpio = new Gpio(RELAY_COUNT);
+	
+	for ($pin = 0; $pin < RELAY_COUNT; $pin++)
 	{
-		$outputStatus = null;
-		system("gpio mode ".$i." out");
-		exec("gpio read ".$i, $outputStatus);
-		
-		renderButton($i, $outputStatus[0]);
+		$outputStatus = $gpio->read($pin);
+
+		renderButton($pin, $outputStatus[0]);
 	}
 	?>
     </body>

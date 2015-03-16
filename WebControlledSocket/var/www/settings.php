@@ -1,3 +1,3 @@
  <?php
- $relayCount = 2;
+define("RELAY_COUNT", 2);
  ?>
