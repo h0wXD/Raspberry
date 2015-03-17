@@ -1,19 +1,20 @@
 ﻿<?php
 include('settings.php');
-include('include/gpio.inc.php');
+include('include/GpioManager.inc.php');
+include('include/RelayStateManager.inc.php');
 
-if (isset($_GET["pin"]) /*&& isset($_GET["status"])*/)
+if (isset($_GET["pin"]))
 {
 	$pin = strip_tags($_GET["pin"]);
-	//$status = strip_tags($_GET["status"]);
-	
-	$gpio = new Gpio(RELAY_COUNT);
+	$gpioManager = new GpioManager(RELAY_COUNT);
+	$relayStateManager = new RelayStateManager(RELAY_STATE_FILE);
 
 	try
 	{
 		$outputStatus = null;
-		if ($gpio->toggle($pin, $outputStatus))
+		if ($gpioManager->toggle($pin, $outputStatus))
 		{
+			$relayStateManager->setState($pin, $outputStatus);
 			die($outputStatus);
 		}
 	}

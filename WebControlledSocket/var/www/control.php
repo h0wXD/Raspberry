@@ -1,4 +1,4 @@
-﻿<?php error_reporting(E_ALL); include('settings.php'); include('include/gpio.inc.php'); ?><!DOCTYPE html>
+﻿<?php include('settings.php'); include('include/GpioManager.inc.php'); ?><!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8" />
@@ -17,7 +17,7 @@
 					if (request.readyState == 4 && request.status == 200)
 					{
 						var status = parseInt(request.responseText);
-						var color = status == <?php echo Gpio::STATUS_OFF; ?> ? "red" : "green";
+						var color = status == <?php echo STATUS_OFF; ?> ? "red" : "green";
 						
 						sender.alt = "" + status;
 						sender.src = "image/" + color + "/button" + pin + ".jpg";
@@ -47,13 +47,13 @@
 	<?php
 	function renderButton($pin, $outputStatus)
 	{
-		$color = $outputStatus == Gpio::STATUS_OFF ? 'red' : 'green';
+		$color = $outputStatus == STATUS_OFF ? 'red' : 'green';
 		$image = sprintf('image/%s/button%s.jpg', $color, $pin);
 
 		echo ('<img id="button'.$pin.'" src="'.$image.'" alt="'.$outputStatus.'" onClick="javascript:onClick(this);" />');
 	}
 	
-	$gpio = new Gpio(RELAY_COUNT);
+	$gpio = new GpioManager(RELAY_COUNT);
 	
 	for ($pin = 0; $pin < RELAY_COUNT; $pin++)
 	{

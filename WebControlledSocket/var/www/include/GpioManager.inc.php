@@ -1,16 +1,13 @@
 ﻿<?php
 
-class Gpio
+class GpioManager
 {
-	const STATUS_ON = '0';
-	const STATUS_OFF = '1';
-	
 	private static $toggleValues;
 	private $count;
 
 	public function __construct($count)
 	{
-		self::$toggleValues = array(self::STATUS_ON => self::STATUS_OFF, self::STATUS_OFF => self::STATUS_ON);
+		self::$toggleValues = array(STATUS_ON => STATUS_OFF, STATUS_OFF => STATUS_ON);
 		$this->count = $count;
 		for ($pin = 0; $pin < $count; $pin++)
 		{
@@ -34,7 +31,7 @@ class Gpio
 	
 	private function validateStatus($status)
 	{
-		if (in_array($status, $this->toggleValues))
+		if (!in_array($status, self::$toggleValues))
 		{
 			throw new Exception('Invalid status provided.');
 		}
