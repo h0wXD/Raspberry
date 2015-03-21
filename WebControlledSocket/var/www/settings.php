@@ -1,5 +1,5 @@
 <?php
-define('RELAY_COUNT', 2);
+define('RELAY_COUNT', 4);
 define('RELAY_STATE_FILE', '/var/www/settings.json');
 
 define('STATUS_ON', '0');
